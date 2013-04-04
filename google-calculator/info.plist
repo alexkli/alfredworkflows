@@ -39,75 +39,6 @@
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>argumenttype</key>
-				<integer>0</integer>
-				<key>escaping</key>
-				<integer>0</integer>
-				<key>keyword</key>
-				<string>calc</string>
-				<key>runningsubtext</key>
-				<string>Calculating...</string>
-				<key>script</key>
-				<string>import httplib
-import urllib
-import json
-import re
-from xml.dom.minidom import Document
-
-q = "{query}"
-params = urllib.urlencode({"q": q})
-conn = httplib.HTTPConnection("www.google.com", 80)
-conn.request("GET", "/ig/calculator?hl=en&amp;"+params)
-response = conn.getresponse()
-data = response.read()
-conn.close()
-
-data = re.sub(r"{\s*(\w)", r'{"\1', data)
-data = re.sub(r",\s*(\w)", r',"\1', data)
-data = re.sub(r"(\w):", r'\1":', data)
-
-dataobj = json.loads(data)
-doc = Document()
-items = doc.createElement("items")
-xmlitem = doc.createElement("item")
-if dataobj["error"] == "":
-	output = dataobj["lhs"] + " = " + dataobj["rhs"]
-else:
-	output = "Error"
-xmlitem.setAttribute("uid", dataobj["lhs"])
-xmlitem.setAttribute("arg", dataobj["rhs"])
-xmlitem.setAttribute("valid", "YES")
-attr = doc.createElement("title")
-attr.appendChild(doc.createTextNode(output))
-xmlitem.appendChild(attr)
-attr = doc.createElement("subtitle")
-attr.appendChild(doc.createTextNode(q))
-xmlitem.appendChild(attr)
-attr = doc.createElement("icon")
-attr.appendChild(doc.createTextNode("icon.png"))
-xmlitem.appendChild(attr)
-items.appendChild(xmlitem)
-
-doc.appendChild(items)
-print unicode(doc.toxml()).encode("utf-8")
-</string>
-				<key>subtext</key>
-				<string>Calculate using Google calculator</string>
-				<key>title</key>
-				<string>Google Calculator</string>
-				<key>type</key>
-				<integer>3</integer>
-				<key>withspace</key>
-				<true/>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.input.scriptfilter</string>
-			<key>uid</key>
-			<string>63F60794-BB56-4415-9372-BAF974C3A7E1</string>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
 				<key>autopaste</key>
 				<false/>
 				<key>clipboardtext</key>
@@ -140,6 +71,99 @@ print unicode(doc.toxml()).encode("utf-8")
 			<string>alfred.workflow.output.notification</string>
 			<key>uid</key>
 			<string>841C3951-A611-422A-BF6B-C52461C2F4F7</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argumenttype</key>
+				<integer>0</integer>
+				<key>escaping</key>
+				<integer>0</integer>
+				<key>keyword</key>
+				<string>calc</string>
+				<key>runningsubtext</key>
+				<string>Calculating...</string>
+				<key>script</key>
+				<string>import sys
+import urllib
+import urllib2
+import yaml
+from xml.sax.saxutils import escape
+
+xml_tpl = '''&lt;?xml version="1.0"?&gt;
+&lt;items&gt;
+  &lt;item uid="%(uid)s" arg="%(arg)s" valid="YES"&gt;
+    &lt;title&gt;%(title)s&lt;/title&gt;
+    &lt;subtitle&gt;%(subtitle)s&lt;/subtitle&gt;
+    &lt;icon&gt;icon.png&lt;/icon&gt;
+  &lt;/item&gt;
+&lt;/items&gt;'''
+
+def xml(uid, arg, title, subtitle=""):
+    return xml_tpl % ({"uid": escape(uid), "arg": escape(arg), "title": title, "subtitle": subtitle})
+    
+
+try:
+    q = "{query}"
+    if len(sys.argv) &gt; 1:
+        q = sys.argv[1]
+    
+    params = urllib.urlencode({"q": q})
+    # faking browser user agent necessary to get back utf-8 encoding
+    headers = { 'User-Agent' : 'Mozilla/5.0' }
+    request = urllib2.Request("http://www.google.com/ig/calculator?hl=en&amp;" + params, None, headers)
+    response = urllib2.urlopen(request).read()
+    response = response.decode("utf-8")
+    # replace magic thousand delimiter char
+    response = response.replace(u"\u00A0", ".")
+    
+    data = yaml.load(response)
+    
+    error = data["error"]
+    exp = data["lhs"]
+    result = data["rhs"]
+    
+    title = q
+    if error == "":
+        result = result.replace("&lt;sup&gt;", "^").replace("&lt;/sup&gt;", "")
+        title = result
+        subtitle = exp + " = " + result
+    else:
+        try:
+            errorcode = int(error)
+        except:
+            errorcode = -1
+        
+        if errorcode == -1:
+            #subtitle = "Oh, Google says: " + error
+            subtitle = "..."
+        elif errorcode == 0:
+            subtitle = q
+            #subtitle = "Please complete expression..."
+        elif errorcode == 4:
+            subtitle = "..."
+            #subtitle = "Sorry, cannot calculate that..."
+        else:
+            subtitle = "Google reported error code " + str(errorcode)
+
+    print xml("calc {query}", result, title, subtitle)
+
+except BaseException, e:
+    print xml("calc {query}", "error", title, "Unexpected error", str(e))
+</string>
+				<key>subtext</key>
+				<string>Calculate using Google calculator</string>
+				<key>title</key>
+				<string>Google Calculator</string>
+				<key>type</key>
+				<integer>3</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>63F60794-BB56-4415-9372-BAF974C3A7E1</string>
 		</dict>
 	</array>
 	<key>readme</key>
