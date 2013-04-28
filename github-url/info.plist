@@ -25,7 +25,7 @@
 	<key>disabled</key>
 	<false/>
 	<key>name</key>
-	<string>Github URL</string>
+	<string>Open in Github</string>
 	<key>objects</key>
 	<array>
 		<dict>
@@ -53,7 +53,7 @@
 				<key>subtext</key>
 				<string>Open github web URL for a git checkout path</string>
 				<key>text</key>
-				<string>Github URL</string>
+				<string>Open in Github</string>
 				<key>withspace</key>
 				<true/>
 			</dict>
