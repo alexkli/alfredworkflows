@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>bundleid</key>
+	<string></string>
+	<key>connections</key>
+	<dict>
+		<key>2C99F6F1-EF16-4CF1-9762-5D05A1FFAA4D</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>16039760-F173-4AB8-9C73-DA7401D5DE23</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
+		</array>
+	</dict>
+	<key>createdby</key>
+	<string>Alexander Klimetschek</string>
+	<key>description</key>
+	<string>Manage tasks using the Clear app</string>
+	<key>disabled</key>
+	<false/>
+	<key>name</key>
+	<string>Clear</string>
+	<key>objects</key>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argumenttype</key>
+				<integer>0</integer>
+				<key>keyword</key>
+				<string>todo</string>
+				<key>subtext</key>
+				<string>Adds task at the top of current list</string>
+				<key>text</key>
+				<string>Add task to Clear</string>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.keyword</string>
+			<key>uid</key>
+			<string>2C99F6F1-EF16-4CF1-9762-5D05A1FFAA4D</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>escaping</key>
+				<integer>62</integer>
+				<key>script</key>
+				<string>tell application "Clear"	activate	#tell application "System Events" to key code 52 using shift down	tell application "System Events" to keystroke "{query}"
+end tell</string>
+				<key>type</key>
+				<integer>6</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>16039760-F173-4AB8-9C73-DA7401D5DE23</string>
+		</dict>
+	</array>
+	<key>readme</key>
+	<string></string>
+	<key>uidata</key>
+	<dict>
+		<key>16039760-F173-4AB8-9C73-DA7401D5DE23</key>
+		<dict>
+			<key>ypos</key>
+			<real>60</real>
+		</dict>
+		<key>2C99F6F1-EF16-4CF1-9762-5D05A1FFAA4D</key>
+		<dict>
+			<key>ypos</key>
+			<real>60</real>
+		</dict>
+	</dict>
+	<key>webaddress</key>
+	<string></string>
+</dict>
+</plist>
