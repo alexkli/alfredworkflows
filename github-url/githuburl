@@ -1,0 +1,44 @@
+#!/usr/bin/ruby
+# Takes a file system path inside a git checkout and returns
+# the github URL for that path based on the git remote url.
+
+require 'pathname'
+
+# convert git clone url to github web url
+def git_url_to_github_web_url(url)
+  # sample: git@git.corp.adobe.com:CQ5/cq5.git
+  #         git@github.com:alexkli/jgit.git
+  m = /(.+)@([\w\d\.]+):\/?(.*).git\/?/.match(url)
+  return "http://#{m[2]}/#{m[3]}" if m
+
+  # sample: https://github.com/alexkli/jgit.git
+  #         git://github.com/alexkli/jgit.git
+  m = /(\w+:\/\/)([\w\d\.]+)\/(.*).git\/?/.match(url)
+  return "http://#{m[2]}/#{m[3]}" if m
+
+  return nil
+end
+
+# get absolute path for argument (or current dir)
+path = Pathname.new(ARGV[0] || ".").realpath.to_s
+
+# get directory to execute git commands in
+dir = FileTest.directory?(path) ? path : File::dirname(path)
+
+# find root of git checkout
+gitroot = `cd #{dir} && git rev-parse --show-toplevel`.strip!
+exit unless gitroot
+
+# calculate relative path inside working directory
+relative_path = Pathname.new(path).relative_path_from(Pathname.new(gitroot)).to_s
+
+# get origin url and parse it
+url = `cd #{dir} && git config --get remote.origin.url`.strip!
+url = git_url_to_github_web_url(url)
+exit unless url
+
+# get current branch
+branch = `cd #{dir} && git rev-parse --abbrev-ref HEAD`.strip!
+
+# generate github URL
+puts "#{url}/tree/#{branch}/#{relative_path}"
