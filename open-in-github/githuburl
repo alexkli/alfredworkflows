@@ -40,5 +40,11 @@ exit unless url
 # get current branch
 branch = `cd #{dir} && git rev-parse --abbrev-ref HEAD`.strip!
 
+commit = ARGV[1]
+
 # generate github URL
-puts "#{url}/tree/#{branch}/#{relative_path}"
+if (commit)
+  puts "#{url}/commit/#{commit}"
+else
+  puts "#{url}/tree/#{branch}/#{relative_path}"
+end
