@@ -26,19 +26,19 @@ path = Pathname.new(ARGV[0] || ".").realpath.to_s
 dir = FileTest.directory?(path) ? path : File::dirname(path)
 
 # find root of git checkout
-gitroot = `cd #{dir} && git rev-parse --show-toplevel`.strip!
+gitroot = `cd '#{dir}' && git rev-parse --show-toplevel`.strip!
 exit unless gitroot
 
 # calculate relative path inside working directory
 relative_path = Pathname.new(path).relative_path_from(Pathname.new(gitroot)).to_s
 
 # get origin url and parse it
-url = `cd #{dir} && git config --get remote.origin.url`.strip!
+url = `cd '#{dir}' && git config --get remote.origin.url`.strip!
 url = git_url_to_github_web_url(url)
 exit unless url
 
 # get current branch
-branch = `cd #{dir} && git rev-parse --abbrev-ref HEAD`.strip!
+branch = `cd '#{dir}' && git rev-parse --abbrev-ref HEAD`.strip!
 
 commit = ARGV[1]
 
